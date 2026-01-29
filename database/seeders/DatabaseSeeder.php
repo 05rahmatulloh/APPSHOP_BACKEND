@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         AdminUser::class,
          CategorySeeder::class,
          ProductSeeder::class,
+         OngkirSeeder::class,
         ]);
     }
 }

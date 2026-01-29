@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow mt-10">
 
-    <h1 class="text-2xl font-bold mb-6">Tambah Diskon Produk</h1>
+    <h1 class="text-2xl font-bold mb-6">Tambah Diskon</h1>
 
     {{-- Error Validation --}}
     @if ($errors->any())
@@ -22,50 +22,48 @@
         {{-- Kode Diskon --}}
         <div class="mb-4">
             <label class="block font-medium mb-1">Kode Diskon</label>
-            <input type="text" name="code" value="{{ old('code') }}" class="w-full border rounded px-3 py-2"
-                placeholder="PROMO10" required>
+            <input type="text" name="code" class="w-full border rounded px-3 py-2" required>
+        </div>
+
+        {{-- Scope --}}
+        <div class="mb-4">
+            <label class="block font-medium mb-1">Jenis Diskon</label>
+            <select name="scope" id="discountScope" class="w-full border rounded px-3 py-2" required>
+                <option value="">-- Pilih --</option>
+                <option value="product">Diskon Produk</option>
+                <option value="order">Gratis Ongkir</option>
+            </select>
         </div>
 
         {{-- Tipe Diskon --}}
-        <div class="mb-4">
+        <div class="mb-4" id="typeWrapper">
             <label class="block font-medium mb-1">Tipe Diskon</label>
-            <select name="type" id="discountType" class="w-full border rounded px-3 py-2" required>
-                <option value="">-- Pilih Tipe --</option>
+            <select name="type" id="discountType" class="w-full border rounded px-3 py-2">
+                <option value="">-- Pilih --</option>
                 <option value="percentage">Persentase (%)</option>
                 <option value="nominal">Nominal (Rp)</option>
                 <option value="free_shipping">Gratis Ongkir</option>
             </select>
         </div>
 
-        {{-- Nilai Diskon --}}
-        <div class="mb-4">
+        {{-- Nilai --}}
+        <div class="mb-4" id="valueWrapper">
             <label class="block font-medium mb-1">Nilai Diskon</label>
-            <input type="number" name="value" id="discountValue" value="{{ old('value') }}"
-                class="w-full border rounded px-3 py-2" placeholder="10">
-            <small class="text-gray-500">
-                * Kosongkan jika gratis ongkir
-            </small>
+            <input type="number" name="value" id="discountValue" class="w-full border rounded px-3 py-2">
         </div>
 
-        {{-- Stok Diskon --}}
+        {{-- Stok --}}
         <div class="mb-4">
-            <label class="block font-medium mb-1">Stok Diskon</label>
-            <input type="number" name="stock" value="{{ old('stock', 0) }}" class="w-full border rounded px-3 py-2"
-                min="0" required>
+            <label class="block font-medium mb-1">Stok</label>
+            <input type="number" name="stock" value="0" min="0" class="w-full border rounded px-3 py-2" required>
         </div>
 
         {{-- Status --}}
         <div class="mb-4">
             <label class="block font-medium mb-1">Status</label>
             <div class="flex gap-6">
-                <label class="flex items-center gap-2">
-                    <input type="radio" name="is_active" value="1" checked>
-                    Aktif
-                </label>
-                <label class="flex items-center gap-2">
-                    <input type="radio" name="is_active" value="0">
-                    Nonaktif
-                </label>
+                <label><input type="radio" name="is_active" value="1" checked> Aktif</label>
+                <label><input type="radio" name="is_active" value="0"> Nonaktif</label>
             </div>
         </div>
 
@@ -73,18 +71,16 @@
         <div class="mb-4 grid grid-cols-2 gap-4">
             <div>
                 <label class="block font-medium mb-1">Start Date</label>
-                <input type="date" name="start_date" value="{{ old('start_date') }}"
-                    class="w-full border rounded px-3 py-2">
+                <input type="date" name="start_date" class="w-full border rounded px-3 py-2">
             </div>
             <div>
                 <label class="block font-medium mb-1">End Date</label>
-                <input type="date" name="end_date" value="{{ old('end_date') }}"
-                    class="w-full border rounded px-3 py-2">
+                <input type="date" name="end_date" class="w-full border rounded px-3 py-2">
             </div>
         </div>
 
         {{-- Produk --}}
-        <div class="mb-6">
+        <div class="mb-6" id="productWrapper">
             <label class="block font-medium mb-2">Produk yang Mendapat Diskon</label>
             <div class="border rounded p-3 max-h-48 overflow-y-auto">
                 @foreach ($products as $product)
@@ -96,25 +92,33 @@
             </div>
         </div>
 
-        {{-- Submit --}}
         <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
             Simpan Diskon
         </button>
     </form>
 </div>
 
-{{-- JS Logic --}}
+{{-- JS --}}
 <script>
-    const typeSelect = document.getElementById('discountType');
-    const valueInput = document.getElementById('discountValue');
+    const scope = document.getElementById('discountScope');
+const type = document.getElementById('discountType');
+const value = document.getElementById('discountValue');
+const productWrapper = document.getElementById('productWrapper');
 
-    typeSelect.addEventListener('change', function () {
-        if (this.value === 'free_shipping') {
-            valueInput.value = 0;
-            valueInput.setAttribute('disabled', true);
-        } else {
-            valueInput.removeAttribute('disabled');
-        }
-    });
+scope.addEventListener('change', function () {
+    if (this.value === 'order') {
+        type.value = 'free_shipping';
+        type.setAttribute('disabled', true);
+
+        value.value = 0;
+        value.setAttribute('disabled', true);
+
+        productWrapper.style.display = 'none';
+    } else {
+        type.removeAttribute('disabled');
+        value.removeAttribute('disabled');
+        productWrapper.style.display = 'block';
+    }
+});
 </script>
 @endsection

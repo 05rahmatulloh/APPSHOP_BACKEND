@@ -35,7 +35,7 @@ class AdminUser extends Seeder
          'name' => 'rahmat',
          'nim' => '22123456',
          'email' => 'rahmatullohuin@gmail.com',
-         'password' => 'password',
+         'password' => Hash::make('rahmat123'), // otomatis di-hash (casts)
          'role' => 'customer',
          'study_program' => 'Sistem Informasi',
          'kampus' => "1",

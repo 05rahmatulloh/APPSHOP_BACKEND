@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\MidtransCallbackController;
 use Symfony\Component\Routing\Route as RoutingRoute;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,11 @@ use Symfony\Component\Routing\Route as RoutingRoute;
 |--------------------------------------------------------------------------
 | Ambil data user yang sedang login
 */
+
+route::get('/authenticated-user', function (Request $request) {
+    return User::all();
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -125,6 +131,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // checkout
         Route::post('/checkout', [CheckoutController::class, 'store']);
+        Route::post('/preview-checkout', [CheckoutController::class, 'preview']);
 
 
 

@@ -6,37 +6,39 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-      Schema::create('discounts', function (Blueprint $table) {
-      $table->id();
-      $table->string('code')->unique();
+        Schema::create('discounts', function (Blueprint $table) {
+            $table->id();
 
-      $table->enum('type', ['percentage', 'nominal', 'free_shipping']);
+            $table->string('code')->unique();
 
-      // persen (1–100) atau nominal
-      $table->decimal('value', 12, 2)->nullable();
+            // 🔑 scope diskon
+            $table->enum('scope', ['product', 'order']);
 
-      $table->integer('stock')->default(0);
+            // tipe diskon
+            $table->enum('type', [
+                'percentage',
+                'nominal',
+                'free_shipping'
+            ]);
 
-      $table->boolean('is_active')->default(true);
+            // nilai diskon (persen / nominal)
+            $table->decimal('value', 12, 2)->nullable();
 
-      $table->dateTime('start_date')->nullable();
-      $table->dateTime('end_date')->nullable();
+            $table->integer('stock')->default(0);
 
-      $table->timestamps();
-      });
+            $table->boolean('is_active')->default(true);
 
+            $table->dateTime('start_date')->nullable();
+            $table->dateTime('end_date')->nullable();
+
+            $table->timestamps();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('dicounts');
+        Schema::dropIfExists('discounts'); // ✅ BENAR
     }
 };
