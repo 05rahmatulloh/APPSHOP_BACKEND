@@ -26,6 +26,9 @@ class CheckoutController extends Controller
             $validated
         );
 
+
+
+        
         if (!$result['success']) {
             return response()->json([
                 'message' => $result['message'],

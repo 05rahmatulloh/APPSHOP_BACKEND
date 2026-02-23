@@ -1,4 +1,4 @@
-@extends('admin.layouts.admin')
+@extends('admin.layouts.app')
 
 @section('content')
 <h4 class="mb-3">Tambah Produk</h4>
@@ -38,13 +38,31 @@
     {{-- DESCRIPTION --}}
     <div class="mb-3">
         <label>Deskripsi</label>
-        <textarea name="description" class="form-control"></textarea>
+        <textarea name="description" class="form-control" required></textarea>
     </div>
 
     {{-- IMAGE --}}
     <div class="mb-3">
-        <label>Gambar</label>
-        <input type="file" name="image" class="form-control">
+        <label>Gambar Produk</label>
+        <input type="file" name="image" class="form-control" required>
+    </div>
+
+    {{-- COD --}}
+    <div class="mb-3">
+        <label>COD Available?</label>
+        <select name="is_cod_available" class="form-control" required>
+            <option value="1">Ya</option>
+            <option value="0">Tidak</option>
+        </select>
+    </div>
+
+    {{-- MIDTRANS --}}
+    <div class="mb-3">
+        <label>Midtrans Available?</label>
+        <select name="is_midtrans_available" class="form-control" required>
+            <option value="1">Ya</option>
+            <option value="0">Tidak</option>
+        </select>
     </div>
 
     {{-- ================= SALE ================= --}}
@@ -54,12 +72,12 @@
 
         <div class="mb-3">
             <label>Harga</label>
-            <input type="number" name="price" class="form-control">
+            <input type="number" name="price" id="price" class="form-control" min="0" disabled>
         </div>
 
         <div class="mb-3">
             <label>Stok</label>
-            <input type="number" name="stock" class="form-control">
+            <input type="number" name="stock" id="stock" class="form-control" min="0" disabled>
         </div>
     </div>
 
@@ -70,20 +88,20 @@
 
         <div class="mb-3">
             <label>Harga / Hari</label>
-            <input type="number" name="price_per_day" class="form-control">
+            <input type="number" name="price_per_day" id="price_per_day" class="form-control" min="0" disabled>
         </div>
 
         <div class="mb-3">
             <label>Deposit (Opsional)</label>
-            <input type="number" name="deposit" class="form-control">
+            <input type="number" name="deposit" class="form-control" min="0" disabled>
         </div>
 
         <small class="text-muted">
-            * Tanggal sewa akan diisi saat ada penyewa
+            * Tanggal sewa akan diatur saat ada penyewa
         </small>
     </div>
 
-    <button type="submit" class="btn btn-success">Simpan</button>
+    <button type="submit" id="submitBtn" class="btn btn-success" disabled>Simpan</button>
     <a href="{{ route('products.index') }}" class="btn btn-secondary">Kembali</a>
 </form>
 
@@ -91,11 +109,42 @@
     const category = document.getElementById('category');
     const sale = document.getElementById('sale-fields');
     const rent = document.getElementById('rent-fields');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const price = document.getElementById('price');
+    const stock = document.getElementById('stock');
+    const pricePerDay = document.getElementById('price_per_day');
 
     function toggleFields() {
         const type = category.options[category.selectedIndex]?.dataset.type;
-        sale.style.display = type === 'sale' ? 'block' : 'none';
-        rent.style.display = type === 'rent' ? 'block' : 'none';
+
+        // reset
+        sale.style.display = 'none';
+        rent.style.display = 'none';
+
+        price.disabled = true;
+        stock.disabled = true;
+        pricePerDay.disabled = true;
+
+        price.required = false;
+        stock.required = false;
+        pricePerDay.required = false;
+
+        submitBtn.disabled = !type;
+
+        if (type === 'sale') {
+            sale.style.display = 'block';
+            price.disabled = false;
+            stock.disabled = false;
+            price.required = true;
+            stock.required = true;
+        }
+
+        if (type === 'rent') {
+            rent.style.display = 'block';
+            pricePerDay.disabled = false;
+            pricePerDay.required = true;
+        }
     }
 
     category.addEventListener('change', toggleFields);

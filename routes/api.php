@@ -12,6 +12,7 @@ use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\MidtransCallbackController;
+use App\Models\Product;
 use Symfony\Component\Routing\Route as RoutingRoute;
 use App\Models\User;
 
@@ -22,8 +23,11 @@ use App\Models\User;
 | Ambil data user yang sedang login
 */
 
-route::get('/authenticated-user', function (Request $request) {
+route::get('/user', function (Request $request) {
     return User::all();
+});
+route::get('/product', function (Request $request) {
+    return Product::all()->load('rentals');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

@@ -14,7 +14,8 @@ class Product extends Model
         'description',
         'image',
         'is_active',
-        'is_cod_available'
+        'is_cod_available',
+        'is_midtrans_available'
     ];
 
     /* ================= RELATION ================= */

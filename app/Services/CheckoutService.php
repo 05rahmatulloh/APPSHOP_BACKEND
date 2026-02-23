@@ -44,6 +44,7 @@ class CheckoutService
      * PREVIEW CHECKOUT
      * =====================
      */
+    
     public function preview($user, array $data): array
     {
         $cart = Cart::with('items.product')
@@ -106,6 +107,7 @@ class CheckoutService
                 'quantity'    => $item->quantity,
                 'subtotal'    => $finalPrice * $item->quantity,
                 'Data Discount' => $result['data'] ?? null,
+                'is_cod_available' => $product->is_cod_available,
             ];
         }
 
@@ -133,46 +135,61 @@ class CheckoutService
      * CHECKOUT FINAL
      * =====================
      */
-    public function checkout($user, array $data): array
-    {
-        return DB::transaction(function () use ($user, $data) {
+  public function checkout($user, array $data): array
+{
+    return DB::transaction(function () use ($user, $data) {
 
-            $preview = $this->preview($user, $data);
+        $preview = $this->preview($user, $data);
 
-            if (!$preview['success']) {
-                return $preview;
-            }
+        if (!$preview['success']) {
+            return $preview;
+        }
 
-            $order = Order::create([
-                'user_id' => $user->id,
-                'order_code' => 'ORD-' . now()->timestamp,
-                'subtotal' => $preview['subtotal'],
-                'discount_total' => $preview['discount_total'],
-                'shipping_cost' => $preview['shipping_cost'],
-                'total' => $preview['total'],
-                'status' => 'pending',
-                'payment_method' => $data['payment_method'],
-                'shipping_address' => $data['shipping_address'],
-            ]);
+        $cart = Cart::with('items.product')
+            ->where('user_id', $user->id)
+            ->first();
 
-            $cart = Cart::with('items.product')
-                ->where('user_id', $user->id)
-                ->first();
-
+        // =====================
+        // VALIDASI KHUSUS COD
+        // =====================
+        if ($data['payment_method'] === 'cod') {
             foreach ($cart->items as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->product_id,
-                    'price' => $item->product->price,
-                    'quantity' => $item->quantity,
-                    'subtotal' => $item->product->price * $item->quantity,
-                ]);
+                if (!$item->product->is_cod_available) {
+                    return [
+                        'success' => false,
+                        'message' => 'Produk "' . $item->product->name . '" tidak mendukung COD'
+                    ];
+                }
             }
+        }
 
-            return [
-                'success' => true,
-                'order' => $order
-            ];
-        });
-    }
+        $order = Order::create([
+            'user_id' => $user->id,
+            'order_code' => 'ORD-' . now()->timestamp,
+            'subtotal' => $preview['subtotal'],
+            'discount_total' => $preview['discount_total'],
+            'shipping_cost' => $preview['shipping_cost'],
+            'total' => $preview['total'],
+            'status' => 'pending',
+            'payment_method' => $data['payment_method'],
+            'shipping_address' => $data['shipping_address'],
+        ]);
+
+        foreach ($cart->items as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'price' => $item->product->price,
+                'quantity' => $item->quantity,
+                'subtotal' => $item->product->price * $item->quantity,
+            ]);
+        }
+
+        return [
+            'success' => true,
+            'order' => $order
+        ];
+    });
+}
+
 }

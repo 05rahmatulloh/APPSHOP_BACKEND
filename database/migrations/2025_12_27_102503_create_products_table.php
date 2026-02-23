@@ -21,13 +21,11 @@ $table->integer('stock')->nullable();
 $table->string('image')->nullable();
 
 // KHUSUS SEWA
-// $table->dateTime('rent_start')->nullable();
-// $table->dateTime('rent_end')->nullable();
-// $table->boolean('is_rented')->default(false);
 
 //COD CEK
 $table->boolean('is_cod_available')->default(true);
-
+//MIDTRANS CEK
+$table->boolean('is_midtrans_available')->default(true);
 
 
 // STATUS AKTIF / NONAKTIF

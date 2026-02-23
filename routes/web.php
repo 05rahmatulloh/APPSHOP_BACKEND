@@ -27,6 +27,6 @@ Route::post('/discounts', [DiscountController::class, 'store'])
 
 
 });
-Route::get('/midtrans-test', function () {
-return view('midtrans');
+Route::get('/midtrans-test/{id}', function ($id) {
+return view('midtrans', ['id' => $id]);
 });

@@ -38,9 +38,10 @@ class ProductController extends Controller
         $rules = [
             'category_id' => 'required|exists:categories,id',
             'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'description' => 'required|string',
+            'image'       => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'is_cod_available' => 'required|boolean',
+            'is_midtrans_available' => 'required|boolean',
         ];
 
         if ($category->type === 'sale') {
@@ -69,9 +70,11 @@ class ProductController extends Controller
       'name' => $request->name,
       'description' => $request->description,
       'price' => $request->price ?? 0,
-      'stock' => $request->stock ?? 0,
+      'stock' => $request->stock ?? 999,
       'is_cod_available' => $request->is_cod_available ?? true,
+      'is_midtrans_available' => $request->is_midtrans_available ?? true,
       'image' => $imagePath,
+
       ]);
 
 
@@ -112,6 +115,8 @@ class ProductController extends Controller
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'is_cod_available' => 'required|boolean',
+            'is_midtrans_available' => 'required|boolean',
         ];
 
         if ($category->type === 'sale') {
@@ -137,14 +142,28 @@ class ProductController extends Controller
         }
 
         // ---------- Update Product ----------
+        if($request->hasFile('image')){
         $product->update([
-        'category_id' => $category->id,
-        'name' => $request->name,
-        'description' => $request->description,
-        'price' => $category->type === 'sale' ? $request->price : 0,
-        'stock' => $category->type === 'sale' ? $request->stock : 0,
-        'is_cod_available' => $request->is_cod_available ?? true,
+            'category_id' => $category->id,
+            'name' => $request->name,
+            'description' => $request->description,
+            'price' => $request->price ?? $product->price,
+            'stock' => $request->stock ?? $product->stock,
+            'is_cod_available' => $request->is_cod_available,
+            'is_midtrans_available' => $request->is_midtrans_available,
+            'image' => $product->image,
         ]);
+        } else {
+            $product->update([
+                'category_id' => $category->id,
+                'name' => $request->name,
+                'description' => $request->description,
+                'price' => $request->price ?? $product->price,
+                'stock' => $request->stock ?? $product->stock,
+                'is_cod_available' => $request->is_cod_available,
+                'is_midtrans_available' => $request->is_midtrans_available,
+            ]);
+        }
 
 
         // ---------- Update Rental ----------

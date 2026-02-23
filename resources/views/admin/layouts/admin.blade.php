@@ -14,20 +14,7 @@
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">Admin</a>
-
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button class="btn btn-sm btn-danger">Logout</button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    
 
     <div class="container">
         @yield('content')
